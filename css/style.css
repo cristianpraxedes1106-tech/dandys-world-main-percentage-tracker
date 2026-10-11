@@ -223,8 +223,8 @@
 
 .drop {
     position: absolute;
-    width: 12px;
-    height: 12px;
+    width: 62px;
+    height: 62px;
 
     pointer-events: none;
     z-index: 4;
