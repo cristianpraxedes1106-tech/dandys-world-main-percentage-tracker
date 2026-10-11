@@ -285,61 +285,73 @@ function clearHistory() {
 
 }
 
-function spawnDrops(quantidade = 6) {
+function spawnDrops(quantidade = 10) {
     const wrapper = document.getElementById("capsuleWrapper");
     if (!wrapper) return;
 
-    // ========== TREME A CÁPSULA ==========
+    // ===== SHAKE DA CÁPSULA =====
     wrapper.classList.remove("shake");
-    void wrapper.offsetWidth; // força reiniciar a animação
+    void wrapper.offsetWidth;
     wrapper.classList.add("shake");
 
     setTimeout(() => {
         wrapper.classList.remove("shake");
-    }, 400);
-    // ====================================
+    }, 450);
 
-    const originX = wrapper.offsetWidth / 2 - 14;
+    // ===== ORIGEM DO RESPINGO =====
+    const originX = wrapper.clientWidth / 2;
     const fillRatio = (progress / 100) * 0.72;
-    const originY = wrapper.offsetHeight * (1 - fillRatio - 0.12);
+
+    const originY =
+        wrapper.clientHeight * (1 - fillRatio - 0.12);
+
+    // Menos partículas = efeito mais leve
+    quantidade = Math.min(quantidade, 12);
 
     for (let i = 0; i < quantidade; i++) {
         const drop = document.createElement("img");
+
         drop.src = "imgs/Ichor.png";
         drop.className = "drop";
-        drop.style.left = originX + "px";
-        drop.style.top = originY + "px";
+        drop.alt = "";
 
-        // ângulo bem aberto
-        const angle = (Math.random() * 170 - 85) * (Math.PI / 180);
-        
-        // distância bem maior
-        const distance = 140 + Math.random() * 220;
-        
+        // Tamanhos pequenos e variados
+        const size = 7 + Math.random() * 11;
+
+        drop.style.width = `${size}px`;
+        drop.style.height = `${size}px`;
+
+        // Todas nascem próximas umas das outras
+        drop.style.left = `${originX + (Math.random() * 16 - 8)}px`;
+        drop.style.top = `${originY + (Math.random() * 12 - 6)}px`;
+
+        // Direção: espalha para os lados e para cima
+        const angle =
+            (Math.random() * 150 - 75) * Math.PI / 180;
+
+        const distance = 45 + Math.random() * 85;
+
         const tx = Math.sin(angle) * distance;
-        const ty = -Math.cos(angle) * distance - 80;
-        
-        // rotação maluca
-        const rot = (Math.random() * 720 - 360) + "deg";
+        const ty = -Math.cos(angle) * distance;
 
-        drop.style.setProperty("--tx", tx + "px");
-        drop.style.setProperty("--ty", ty + "px");
+        const rot = (Math.random() * 360 - 180) + "deg";
+
+        drop.style.setProperty("--tx", `${tx}px`);
+        drop.style.setProperty("--ty", `${ty}px`);
         drop.style.setProperty("--rot", rot);
 
-        // duração aleatória
-        const duration = 0.55 + Math.random() * 0.7;
-        drop.style.animation = `splash ${duration}s ease-out forwards`;
+        // Cada gota tem seu próprio ritmo
+        const duration = 0.35 + Math.random() * 0.3;
 
-        // tamanho aleatório das gotas
-        const size = 108 + Math.random() * 22;
-        drop.style.width = size + "px";
-        drop.style.height = size + "px";
+        drop.style.animation =
+            `splash ${duration}s cubic-bezier(.2,.7,.3,1) forwards`;
 
         wrapper.appendChild(drop);
 
-        setTimeout(() => {
+        // Remove a partícula após a animação
+        drop.addEventListener("animationend", () => {
             drop.remove();
-        }, 1400);
+        }, { once: true });
     }
 }
 
