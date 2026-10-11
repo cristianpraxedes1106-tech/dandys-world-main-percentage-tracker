@@ -37,11 +37,11 @@ function prevFloor()  {
     if (floor < 0) {
         floor = 0;
         
-        const Tv_Click = new Audio('../sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
         Tv_Click.play();
     }
     else {
-        const Tape = new Audio('../sfx/Tape.mp3');
+        const Tape = new Audio('./sfx/Tape.mp3');
         Tape.volume = 0.5;
         Tape.play();
 
@@ -85,7 +85,7 @@ function nextFloor() {
 
     // ========== LOCK ==========
     if (progress >= 100) {
-        const Tv_Click = new Audio('../sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
         Tv_Click.play();
         return;
     }
@@ -98,12 +98,12 @@ function nextFloor() {
     if (floor >= 0 && floor <= 4) {
         progress += 0;
 
-        const RUI = new Audio('../sfx/RUI.mp3');
+        const RUI = new Audio('./sfx/RUI.mp3');
         RUI.play();
     }
 
     else{
-        const Ichor_Gain = new Audio('../sfx/Ichor_gain.mp3');
+        const Ichor_Gain = new Audio('./sfx/Ichor_gain.mp3');
         Ichor_Gain.volume = 0.65;
         Ichor_Gain.play();
     }
@@ -123,7 +123,7 @@ function nextFloor() {
 
     if (progress >= 100) {
         progress = 100;
-        const FM = new Audio('../sfx/FM.mp3');
+        const FM = new Audio('./sfx/FM.mp3');
         FM.play();
     }
 
@@ -154,7 +154,7 @@ function nextFloor() {
 function resetFloor()  {
 
     if (floor == 0) {      
-        const Tv_Click = new Audio('../sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
         Tv_Click.play();
     }
     else{
@@ -164,7 +164,7 @@ function resetFloor()  {
 
         lastSpottedFloor = -1;
 
-        const Tv_Off = new Audio('../sfx/Tv_Off.mp3');
+        const Tv_Off = new Audio('./sfx/Tv_Off.mp3');
         Tv_Off.play();
     }
 
@@ -191,19 +191,19 @@ function mainSpotted() {
 
     // ========== TRAVA POR FLOOR ==========
     if (floor === lastSpottedFloor) {
-        const Tv_Click = new Audio('../sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
         Tv_Click.play();
         return; // já spottou nesse floor, trava
     }
     // ====================================
 
     if (floor <= 4) {
-        const Tv_Click = new Audio('../sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
         Tv_Click.play();
         document.getElementById("mainSpotted").innerHTML = "";
     }
     else {
-        const VT = new Audio('../sfx/VT.mp3');
+        const VT = new Audio('./sfx/VT.mp3');
         VT.play();
 
         // marca esse floor como já spottado
@@ -244,7 +244,7 @@ function mainSpotted() {
 function clearHistory() {
 
     if (document.getElementById("mainSpotted").innerHTML != "") {
-        const SE = new Audio('../sfx/SE.mp3');
+        const SE = new Audio('./sfx/SE.mp3');
         SE.currentTime = 1.5;
         SE.play();
 
@@ -257,7 +257,7 @@ function clearHistory() {
     }
 
     else{
-        const Tv_Click = new Audio('../sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
         Tv_Click.play();
     }
 
