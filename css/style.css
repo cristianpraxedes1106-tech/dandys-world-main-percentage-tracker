@@ -223,46 +223,33 @@
 
 .drop {
     position: absolute;
-    width: 78px !important;
-    height: 78px !important;
+    width: 12px;
+    height: 12px;
+
     pointer-events: none;
-    z-index: 0;
+    z-index: 4;
+
+    object-fit: contain;
     will-change: transform, opacity;
+
+    transform-origin: center;
 }
 
 @keyframes splash {
     0% {
-        transform: translate(0, 0) scale(0.3) rotate(0deg);
+        transform: translate(0, 0) scale(0.2) rotate(0deg);
         opacity: 0;
     }
 
-    12% {
-        transform: translate(
-            calc(var(--tx) * -0.08),
-            calc(var(--ty) * -0.08)
-        ) scale(1.15) rotate(calc(var(--rot) * -0.1));
+    15% {
+        transform: translate(0, 0) scale(1.15) rotate(0deg);
         opacity: 1;
-    }
-
-    45% {
-        transform: translate(
-            calc(var(--tx) * 0.55),
-            calc(var(--ty) * 0.55)
-        ) scale(1) rotate(calc(var(--rot) * 0.5));
-        opacity: 1;
-    }
-
-    75% {
-        transform: translate(
-            calc(var(--tx) * 0.9),
-            calc(var(--ty) * 0.9)
-        ) scale(0.8) rotate(calc(var(--rot) * 0.85));
-        opacity: 0.85;
     }
 
     100% {
-        transform: translate(var(--tx), var(--ty))
-            scale(0.15)
+        transform:
+            translate(var(--tx), var(--ty))
+            scale(0.45)
             rotate(var(--rot));
         opacity: 0;
     }
