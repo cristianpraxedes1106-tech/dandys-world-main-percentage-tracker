@@ -1,10 +1,72 @@
 let floor = 0;
-
 let progress = 0;
-
-let number = parseInt(document.getElementById("capsuleNumber").value);
-
 let lastSpottedFloor = -1;
+let twistedSlots = 2;
+
+function getMainChance(currentFloor, slots = twistedSlots) {
+    if (currentFloor < 5) return 0;
+    if (currentFloor > 0 && currentFloor % 20 === 0) return 100;
+
+    // Community-documented rarity weights.
+    const rareWeight = 10 + Math.floor((currentFloor - 3) / 2);
+    const mainWeight = 4 * Math.floor(currentFloor / 5);
+    const totalWeight = 75 + 25 + rareWeight + mainWeight;
+    const chancePerSlot = mainWeight / totalWeight;
+
+    // Probability of at least one Main across N Twisted slots.
+    return (1 - Math.pow(1 - chancePerSlot, slots)) * 100;
+}
+
+function updateChance() {
+    progress = getMainChance(floor);
+    const capsuleNumber = document.getElementById("capsuleNumber");
+    if (capsuleNumber) capsuleNumber.textContent = progress.toFixed(2).replace(/\.00$/, "") + "%";
+
+    const bar = document.getElementById("progressBar");
+    if (bar) {
+        bar.style.height = (progress * 0.72) + "%";
+        bar.classList.toggle("progress-full", progress >= 100);
+        bar.classList.toggle("progress-normal", progress < 100);
+    }
+    tableVerifier();
+}
+
+function addSlotSelector() {
+    const floorHeading = document.getElementById("floor")?.closest("h2");
+    if (!floorHeading || document.getElementById("twistedSlots")) return;
+
+    const wrapper = document.createElement("div");
+    wrapper.style.margin = "12px 0";
+    wrapper.className = "twisted-slots-control";
+
+    const label = document.createElement("label");
+    label.htmlFor = "twistedSlots";
+    label.textContent = "Twisted slots on this Floor: ";
+    label.style.marginRight = "8px";
+
+    const select = document.createElement("select");
+    select.id = "twistedSlots";
+    select.className = "form-select d-inline-block";
+    select.style.width = "auto";
+    select.style.minWidth = "80px";
+    select.setAttribute("aria-label", "Number of Twisted slots on this floor");
+
+    for (let amount = 2; amount <= 8; amount++) {
+        const option = document.createElement("option");
+        option.value = String(amount);
+        option.textContent = String(amount);
+        if (amount === twistedSlots) option.selected = true;
+        select.appendChild(option);
+    }
+
+    select.addEventListener("change", () => {
+        twistedSlots = Number(select.value);
+        updateChance();
+    });
+
+    wrapper.append(label, select);
+    floorHeading.insertAdjacentElement("afterend", wrapper);
+}
 
 function tableVerifier() {
     const floors = [
@@ -20,269 +82,130 @@ function tableVerifier() {
     floors.forEach(({ min, max, condition, id }) => {
         const row = document.getElementById(id);
         if (!row) return;
-
-        const active = condition
-            ? condition(floor)
-            : floor >= min && floor <= max;
-
+        const active = condition ? condition(floor) : floor >= min && floor <= max;
         row.classList.toggle("textoVerde", active);
         row.classList.toggle("textoPreto", !active);
     });
+
+    const setCell = (id, value) => {
+        const cell = document.getElementById(id)?.querySelector("td");
+        if (cell) cell.textContent = value;
+    };
+    const range = (start, end) =>
+        getMainChance(start).toFixed(2) + "% – " + getMainChance(end).toFixed(2) + "%";
+
+    setCell("f0To4", "0%");
+    setCell("f5To9", range(5, 9));
+    setCell("f10To14", range(10, 14));
+    setCell("f15To19", range(15, 19));
+    setCell("f20", "100% (guaranteed)");
+    setCell("f21To24", range(21, 24));
+    setCell("f25Plus", "Varies by Floor — see capsule");
 }
 
-function prevFloor()  {
-
-    let oldFloor = floor;
-
-    floor = floor - 1;
-
-    if (floor < 0) {
-        floor = 0;
-        
-        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
-        Tv_Click.play();
-    }
-    else {
-        const Tape = new Audio('./sfx/Tape.mp3');
-        Tape.volume = 0.5;
-        Tape.play();
-
-        if (oldFloor >= 5 && oldFloor <= 9) {
-            progress = 4;
-        }
-
-        else if (oldFloor >= 10 && oldFloor <= 14) {
-            progress = 8;
-        }
-
-        else if (oldFloor >= 15 && oldFloor <= 19) {
-            progress = 12;
-        }
-
-        else if (oldFloor % 20 === 0) {
-            progress = 100;
-        }
-
-        else if (oldFloor >= 21 && oldFloor <= 24) {
-            progress = 16;
-        }
-
-        else if (oldFloor >= 25 && oldFloor % 20 !== 0) {
-            progress = 20;
-        }
-
-        if (progress < 0) {
-            progress = 0;
-        }
-        
-        document.getElementById("capsuleNumber").innerHTML = progress + "%";
-
-        const bar = document.getElementById("progressBar");
-
-        if (progress < 100) {
-            bar.classList.remove("progress-full");
-            bar.classList.add("progress-normal");
-        }
-
-        if (bar) {
-            bar.style.height = (progress * 0.72) + "%";
-        }
-    }
-
-    document.getElementById("floor").innerHTML = floor;
-
-    tableVerifier();
-}
-
-function nextFloor() {
-
-    // ========== LOCK ==========
-    if (progress >= 100) {
-        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
+function prevFloor() {
+    if (floor <= 0) {
+        const Tv_Click = new Audio("./sfx/Tv_Click.mp3");
         Tv_Click.play();
         return;
     }
-    // =========================
 
-    
-    floor = floor + 1;
-    document.getElementById("floor").innerHTML = floor;
+    floor--;
+    const Tape = new Audio("./sfx/Tape.mp3");
+    Tape.volume = 0.5;
+    Tape.play();
+    document.getElementById("floor").textContent = floor;
+    updateChance();
+}
 
-    if (floor >= 0 && floor <= 4) {
-        progress += 0;
+function nextFloor() {
+    floor++;
+    document.getElementById("floor").textContent = floor;
 
-        const RUI = new Audio('./sfx/RUI.mp3');
+    if (floor <= 4) {
+        const RUI = new Audio("./sfx/RUI.mp3");
         RUI.play();
-    }
-
-    else{
-        const Ichor_Gain = new Audio('./sfx/Ichor_Gain.mp3');
+    } else {
+        const Ichor_Gain = new Audio("./sfx/Ichor_Gain.mp3");
         Ichor_Gain.volume = 0.65;
         Ichor_Gain.play();
-    }
-
-    if (floor >= 5 && floor <= 9) {
-        progress = 3;
-    }
-
-    else if (floor >= 10 && floor <= 14) {
-        progress = 7;
-    }
-
-    else if (floor >= 15 && floor <= 19) {
-        progress = 9;
-    }
-
-    else if (floor % 20 === 0) {
-        progress = 100;
-    }
-    else if (floor >= 21 && floor <= 24) {
-        progress = 16;
-    }
-
-    else if (floor >= 25 && floor % 20 !== 0) {
-        progress = 20;
-    }
-
-    if (progress >= 100) {
-        progress = 100;
-        const FM = new Audio('./sfx/FM.mp3');
-        FM.play();
-    }
-
-    const bar = document.getElementById("progressBar");
-
-    if (bar) {
-
-        bar.style.height = (progress * 0.72) + "%";
-
-        if (progress >= 100) {
-            bar.classList.remove("progress-normal");
-            bar.classList.add("progress-full");
-        } else {
-            bar.classList.remove("progress-full");
-            bar.classList.add("progress-normal");
-        }
-    }
-
-    if (floor >= 5) {
         spawnDrops(16 + Math.floor(Math.random() * 10));
     }
 
-    document.getElementById("capsuleNumber").innerHTML = progress + "%";
-
-    tableVerifier();
-
+    if (floor > 0 && floor % 20 === 0) {
+        const FM = new Audio("./sfx/FM.mp3");
+        FM.play();
+    }
+    updateChance();
 }
 
-function resetFloor()  {
-
-    if (floor == 0) {      
-        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
+function resetFloor() {
+    if (floor === 0) {
+        const Tv_Click = new Audio("./sfx/Tv_Click.mp3");
         Tv_Click.play();
-    }
-    else{
-        floor = 0;
-
-        progress = 0;
-
-        lastSpottedFloor = -1;
-
-        const Tv_Off = new Audio('./sfx/Tv_Off.mp3');
-        Tv_Off.play();
+        return;
     }
 
-    document.getElementById("floor").innerHTML = floor;
-    document.getElementById("capsuleNumber").innerHTML = progress + "%";
+    floor = 0;
+    lastSpottedFloor = -1;
+    const Tv_Off = new Audio("./sfx/Tv_Off.mp3");
+    Tv_Off.play();
 
-    const bar = document.getElementById("progressBar");
-    if (bar) {
-        bar.style.height = "0%";
-        bar.classList.remove("progress-full");
-        bar.classList.add("progress-normal");
-    }
-
+    document.getElementById("floor").textContent = floor;
     const historico = document.getElementById("mainSpotted");
-
-    historico.innerHTML = "";
-
-    historico.classList.remove("container-css-historico");
-
-    tableVerifier();
+    if (historico) {
+        historico.innerHTML = "";
+        historico.classList.remove("container-css-historico");
+    }
+    updateChance();
 }
 
 function mainSpotted() {
-
-    // ========== TRAVA POR FLOOR ==========
     if (floor === lastSpottedFloor) {
-        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio("./sfx/Tv_Click.mp3");
         Tv_Click.play();
-        return; // já spottou nesse floor, trava
+        return;
     }
-    // ====================================
 
     if (floor <= 4) {
-        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
+        const Tv_Click = new Audio("./sfx/Tv_Click.mp3");
         Tv_Click.play();
         document.getElementById("mainSpotted").innerHTML = "";
+        return;
     }
-    else {
-        const VT = new Audio('./sfx/VT.mp3');
-        VT.play();
 
-        lastSpottedFloor = floor;
+    const VT = new Audio("./sfx/VT.mp3");
+    VT.play();
+    lastSpottedFloor = floor;
 
-        progress = 0;
-        document.getElementById("capsuleNumber").innerHTML = progress + "%";
+    // The probability describes this Floor, so spotting a Main doesn't reset it.
+    const historico = document.getElementById("mainSpotted");
+    const novaLinha = document.createElement("div");
+    novaLinha.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+            <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+        </svg> Main Twisted spotted in Floor ${floor}!
+    `;
 
-        const bar = document.getElementById("progressBar");
-        if (bar) {
-            bar.style.height = "0%";
-            bar.classList.remove("progress-full");
-            bar.classList.add("progress-normal");
-        }
-
-        // ========== HISTÓRICO (máximo 7) ==========
-        const historico = document.getElementById("mainSpotted");
-
-        const novaLinha = document.createElement("div");
-        novaLinha.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
-                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
-            </svg> Main Twisted spotted in Floor ${floor}!
-        `;
-
-        historico.classList.add("container-css-historico");
-
-        historico.appendChild(novaLinha);
-
-        while (historico.children.length > 10) {
-            historico.removeChild(historico.firstChild);
-        }
-        // ==========================================
+    historico.classList.add("container-css-historico");
+    historico.appendChild(novaLinha);
+    while (historico.children.length > 10) {
+        historico.removeChild(historico.firstChild);
     }
 }
 
 function clearHistory() {
-
-    if (document.getElementById("mainSpotted").innerHTML != "") {
-        const SE = new Audio('./sfx/SE.mp3');
+    const historico = document.getElementById("mainSpotted");
+    if (historico && historico.innerHTML !== "") {
+        const SE = new Audio("./sfx/SE.mp3");
         SE.currentTime = 1.5;
         SE.play();
-
-        const historico = document.getElementById("mainSpotted");
-
         historico.innerHTML = "";
-
         historico.classList.remove("container-css-historico");
-
-    }
-
-    else{
-        const Tv_Click = new Audio('./sfx/Tv_Click.mp3');
+    } else {
+        const Tv_Click = new Audio("./sfx/Tv_Click.mp3");
         Tv_Click.play();
     }
-
 }
 
 function spawnDrops(quantidade = 10) {
@@ -355,4 +278,6 @@ function spawnDrops(quantidade = 10) {
     }
 }
 
-tableVerifier();
+
+addSlotSelector();
+updateChance();
