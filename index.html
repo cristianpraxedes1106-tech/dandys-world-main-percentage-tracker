@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dandys World Main % Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@300..700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+
+    
+    <link rel="icon" type="image/png" href="imgs/dandy-logo-mt.png" style="height: 1000%;">
+
+</head>
+<body>
+
+    <div class="background"></div>
+
+    <div class="container"  style="align-items: center;">
+
+        <div class="row" style="margin-top: 50px;">
+
+            <div class="container-css">
+
+                <div>
+                    <img src="imgs/gameLogo.webp" alt="" class="img-fluid">
+                </div>
+
+                <h2 class="texto" style="font-size: 55px;">Main % Tracker</h2>
+
+                <i class="creator-text">Created by: aqueletaldeRaz</i>
+
+            </div>
+
+        </div>
+
+        <div class="row container-css" style="margin-top: 20px">
+
+            <h2 class="texto" style="font-size: 45px; margin-bottom: 30px; margin-top: 15px;">Command Panel</h2>
+
+            <div class="container-css-inside" style="margin-bottom: 70px;">
+
+                <br>
+
+                <div class="capsule-wrapper" id="capsuleWrapper">
+                    <div class="progress-fill" id="progressBar"></div>
+                        <img src="imgs/capsule.png" class="capsule" alt="Capsule">
+                    <div class="capsule-number" id="capsuleNumber">0%</div>
+                </div>
+
+                <br>
+
+                <h2 class="texto" style="font-size: 55px;">Current Floor: <span id="floor">0</span></h2>
+
+            </div>
+
+            <h3 class="texto">
+                
+                Mode: 
+
+                <h1 id="trackerMode" class="texto persys">Percentage Mode</h1>
+
+            </h3>
+
+        </div>
+
+        <br>
+
+        <div class="row">
+
+            <div class="container-css" style="padding-top: 35px;">
+
+                <button type="button" onclick="prevFloor()" class="btn btn-css btn-danger">
+    
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-start-fill btn-logo" viewBox="0 0 16 16">
+                        <path d="M4 4a.5.5 0 0 1 1 0v3.248l6.267-3.636c.54-.313 1.232.066 1.232.696v7.384c0 .63-.692 1.01-1.232.697L5 8.753V12a.5.5 0 0 1-1 0z"/>
+                    </svg>
+                            
+                </button>
+
+                <button type="button" onclick="resetFloor()" class="btn btn-css btn-warning" style="color: white;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-rewind-fill btn-logo" viewBox="0 0 16 16">
+                        <path d="M8.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z"/>
+                        <path d="M.404 7.304a.802.802 0 0 0 0 1.392l6.363 3.692c.52.302 1.233-.043 1.233-.696V4.308c0-.653-.713-.998-1.233-.696z"/>
+                    </svg>
+                </button>
+
+                <button type="button" onclick="nextFloor()" class="btn btn-css btn-success">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-skip-end-fill btn-logo" viewBox="0 0 16 16">
+                        <path d="M12.5 4a.5.5 0 0 0-1 0v3.248L5.233 3.612C4.693 3.3 4 3.678 4 4.308v7.384c0 .63.692 1.01 1.233.697L11.5 8.753V12a.5.5 0 0 0 1 0z"/>
+                    </svg>
+
+                </button>
+
+                <button type="button" onclick="clearHistory()" class="btn btn-css btn-secondary">
+                        
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill btn-logo" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                    </svg>
+
+                </button>
+
+                <button type="button" onclick="mainSpotted()" class="btn btn-success btn-css mainSpottedBtn">
+                    <img src="imgs/dandy-logo.png" alt="" style="width: 32.5px; height: fixed;">
+                </button>
+
+                <button type="button" onclick="changeMode()" class="btn btn-primary btn-css">
+
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat btn-logo" viewBox="0 0 16 16">
+                        <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41m-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9"/>
+                        <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.9A5 5 0 0 0 8 3M3.1 9a5.002 5.002 0 0 0 8.757 2.182.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9z"/>
+                    </svg>
+
+                </button>
+
+                <br><br>
+
+                <div class="row" style="margin-left: 335px;"> 
+
+                    
+                    <details class="container-css-log">
+
+                        <summary class="texto" style="font-size: 35px;">
+                            More details
+                        </summary>
+                        
+                        <div class="container-css-inside">
+
+                            <div class="textoVermelho">Previous Floor</div>
+                            <div class="textoAmarelo">Reset Floors</div>
+                            <div class="textoVerde">Next Floor</div>
+                            <div class="textoCinza">Delete Logs</div>
+                            <div class="textoRainbow">Main Spotted</div>
+                            <div class="textoAzul">Change Mode</div>
+
+                        </div>
+
+                        <br>
+
+                    </details>
+
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <br>
+
+        <div class="row">
+
+            <br>
+
+            <details class="container-css-table" style="width: 600px; margin-left: 340px;">
+
+                <summary class="texto" style="font-size: 35px;">Log</summary>
+
+                <p id="mainSpotted" class="container-css-inside textoVerde"></p>
+
+            </details>
+
+        </div>
+
+        <br>
+
+        <div class="row">
+
+            <div class="col-md-5 offset-sm-1 container-css-table" style="display: flex; padding-top: 15px;">
+
+                <table class="table table-striped table-sm container-css-inside">
+
+                        <thead>
+
+                            <tr>
+                                <th scope="col">Floor</th>
+                                <th scope="col">% Chance</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <th scope="row"></th>
+                                <td></td>
+                            </tr>
+
+                            <tr id="f0To4">
+                                <th scope="row">0 - 4</th>
+                                <td>0%</td>
+                            </tr>
+
+                            <tr id="f5To9">
+                                <th scope="row">5 - 9</th>
+                                <td>4%</td>
+                            </tr>
+
+                            <tr id="f10To14">
+                                <th scope="row">10 - 14</th>
+                                <td>8%</td>
+                            </tr>
+
+                            <tr id="f15To19">
+                                <th scope="row">15 - 19</th>
+                                <td>12%</td>
+                            </tr>
+
+                            <tr id="f21To25">
+                                <th scope="row">21 - 25</th>
+                                <td>16%</td>
+                            </tr>
+
+                            
+                            <tr id="f27Plus">
+                                <th scope="row">26+</th>
+                                <td>20%</td>
+                            </tr>
+
+                        </tbody>
+
+                </table>
+
+            </div>
+
+            <div class="col-md-5 container-css-table" style="display: flex; padding-top: 15px;">
+
+                <table class="table table-striped table-sm container-css-inside">
+
+                        <thead>
+
+                            <tr>
+                                <th colspan="3" class="floor-conditions-title">
+                                    Floor Specific Conditions
+                                </th>
+                            </tr>
+
+                            <tr>
+                                <th colspan="3"></th>
+                            </tr>
+
+                            <tr>
+                                <th scope="col">Condition</th>
+                                <th scope="col">% Chance</th>
+                                <th scope="col">Reason</th>
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+
+                            <tr id="f20">
+                                <th scope="row">Every 20 floors</th>
+                                <td>100%</td>
+                                <td>Guaranteed Main</td>
+                            </tr>
+
+                           
+                            <tr id="breakRoomRow" class="textoPreto">
+                                <th scope="row">Every 25 floors</th>
+                                <td>0%</td>
+                                <td>Break Rooms</td>
+                            </tr>
+
+                        </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <script src="js/script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+    
+    <img src="imgs/dandy-logo-mt.png" alt="" class="imgFixa">
+
+</body>
+</html>
