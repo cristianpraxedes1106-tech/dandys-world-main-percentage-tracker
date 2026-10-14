@@ -104,7 +104,7 @@
                 </button>
 
                 <button type="button" onclick="mainSpotted()" class="btn btn-success btn-css mainSpottedBtn">
-                    <img src="imgs/dandy-logo.png" alt="" style="width: 32.5px; height: fixed;">
+                    <img src="imgs/dandy-logo.png" alt="" style="width: 32.5px; height: fixed; margin-left: 2px; margin-right: 1px;">
                 </button>
 
                 <button type="button" onclick="changeMode()" class="btn btn-primary btn-css">
@@ -151,17 +151,21 @@
 
         <br>
 
-        <div class="row">
+        <div class="row" >
 
             <br>
 
-            <details class="container-css-table" style="width: 600px; margin-left: 340px;">
+            <div style="display: flex; justify-content: center; padding-right: 30px ;">
+
+                <details class="container-css-table" style="width: 600px;">
 
                 <summary class="texto" style="font-size: 35px;">Log</summary>
 
                 <p id="mainSpotted" class="container-css-inside textoVerde"></p>
 
-            </details>
+                </details>
+
+            </div>
 
         </div>
 
@@ -194,28 +198,28 @@
 
                             <tr id="f5To9">
                                 <th scope="row">5 - 9</th>
-                                <td>4%</td>
+                                <td>3%</td>
                             </tr>
 
                             <tr id="f10To14">
                                 <th scope="row">10 - 14</th>
-                                <td>8%</td>
+                                <td>7%</td>
                             </tr>
 
                             <tr id="f15To19">
                                 <th scope="row">15 - 19</th>
-                                <td>12%</td>
+                                <td>9%</td>
                             </tr>
 
                             <tr id="f21To25">
                                 <th scope="row">21 - 25</th>
-                                <td>16%</td>
+                                <td>12%</td>
                             </tr>
 
                             
                             <tr id="f27Plus">
                                 <th scope="row">26+</th>
-                                <td>20%</td>
+                                <td>15%</td>
                             </tr>
 
                         </tbody>
@@ -282,7 +286,7 @@
     <script src="js/script.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
     
-    <img src="imgs/dandy-logo-mt.png" alt="" class="imgFixa">
+    <img src="imgs/dandy-logo-mt.png" alt="" class="imgFixa img-fluid" type="button">
 
 </body>
 </html>
