@@ -1,4 +1,3 @@
-
 let floor = 0;
 let progress = 0;
 let pity = 0;
@@ -26,8 +25,9 @@ function getFloorProgress(f) {
 
 function getPityProgress(f) {
     let total = 0;
+    const start = Math.max(0, lastSpottedFloor + 1);
 
-    for (let i = lastSpottedFloor + 1; i <= f; i++) {
+    for (let i = start; i <= f; i++) {
         total += getFloorProgress(i);
     }
 
@@ -41,30 +41,40 @@ function updateProgress() {
 }
 
 function changeMode() {
-
-    tc = document.getElementById("trackerMode");
+    const tc = document.getElementById("trackerMode");
+    if (!tc) return;
 
     if (currentMode === "percentage") {
         currentMode = "pity";
-
         tc.innerHTML = "Pity System";
-
         tc.classList.remove("persys");
         tc.classList.add("pitsys");
-
-    } 
-    
-    else {
+    } else {
         currentMode = "percentage";
-
         tc.innerHTML = "Percentage System";
-
         tc.classList.add("persys");
         tc.classList.remove("pitsys");
     }
 
     playSound("./sfx/MM.mp3", 0.3, 0.19);
 
+    // Reset total ao trocar de modo
+    floor = 0;
+    progress = 0;
+    pity = 0;
+    spottedFloors = [];
+    lastSpottedFloor = -1;
+    isBreakFloor = false;
+
+    updateFloorDisplay();
+
+    const historico = document.getElementById("mainSpotted");
+    if (historico) {
+        historico.innerHTML = "";
+        historico.classList.remove("container-css-historico");
+    }
+
+    tableVerifier();
     updateProgress();
     updateCapsule();
 }
@@ -74,14 +84,11 @@ function updateCapsule() {
     const bar = document.getElementById("progressBar");
 
     if (capsuleNumber) {
-        capsuleNumber.innerHTML = currentMode === "pity"
-            ? progress + "%"
-            : progress + "%";
+        capsuleNumber.innerHTML = progress + "%";
     }
 
     if (bar) {
         const visualProgress = Math.min(progress, 100);
-
         bar.style.height = (visualProgress * 0.72) + "%";
         bar.classList.toggle("progress-full", progress >= 100);
         bar.classList.toggle("progress-normal", progress < 100);
@@ -89,8 +96,10 @@ function updateCapsule() {
 }
 
 function updateFloorDisplay() {
-    document.getElementById("floor").innerHTML =
-        isBreakFloor ? "<br> Break Floor" : floor;
+    const floorEl = document.getElementById("floor");
+    if (!floorEl) return;
+
+    floorEl.innerHTML = isBreakFloor ? "Break Floor" : floor;
 }
 
 function tableVerifier() {
@@ -120,7 +129,6 @@ function tableVerifier() {
     });
 
     const breakRow = document.getElementById("breakRoomRow");
-
     if (breakRow) {
         breakRow.classList.toggle("textoVerde", isBreakFloor);
         breakRow.classList.toggle("textoPreto", !isBreakFloor);
@@ -134,10 +142,10 @@ function removeFutureSpottedFloors() {
         : -1;
 
     const historico = document.getElementById("mainSpotted");
+    if (!historico) return;
 
     Array.from(historico.children).forEach(registro => {
         const spottedFloor = Number(registro.dataset.floor);
-
         if (spottedFloor > floor) {
             registro.remove();
         }
@@ -153,9 +161,7 @@ function prevFloor() {
         isBreakFloor = false;
         removeFutureSpottedFloors();
         updateProgress();
-
         playSound("./sfx/Tape.mp3", 0.5);
-
         updateFloorDisplay();
         updateCapsule();
         tableVerifier();
@@ -167,15 +173,13 @@ function prevFloor() {
         return;
     }
 
+    // Entrando em Break Floor ao voltar de um múltiplo de 25
     if (floor > 25 && (floor - 1) % 25 === 0) {
         floor--;
         isBreakFloor = true;
-
         removeFutureSpottedFloors();
         updateProgress();
-
         playSound("./sfx/BT.mp3", 0.5);
-
         updateFloorDisplay();
         updateCapsule();
         tableVerifier();
@@ -183,21 +187,58 @@ function prevFloor() {
     }
 
     floor--;
-
     removeFutureSpottedFloors();
     updateProgress();
-
     playSound("./sfx/Tape.mp3", 0.5);
-
     updateFloorDisplay();
     updateCapsule();
     tableVerifier();
 }
 
+function forceSpotCurrentFloor() {
+    // Só spota se realmente puder
+    if (isBreakFloor || floor <= 4 || spottedFloors.includes(floor)) return false;
+
+    playSound("./sfx/VT.mp3");
+
+    spottedFloors.push(floor);
+    lastSpottedFloor = floor;
+
+    const historico = document.getElementById("mainSpotted");
+    if (historico) {
+        const novaLinha = document.createElement("div");
+        novaLinha.dataset.floor = floor;
+
+        novaLinha.innerHTML = `
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
+                <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
+            </svg>
+            Main Twisted spotted in Floor ${floor}! <span style="opacity:0.7;">(auto)</span>
+        `;
+
+        historico.classList.add("container-css-historico");
+        historico.appendChild(novaLinha);
+
+        while (historico.children.length > 10) {
+            historico.removeChild(historico.firstChild);
+        }
+    }
+
+    updateProgress();
+    updateCapsule();
+    return true;
+}
+
 function nextFloor() {
-    if (progress >= 100) {
+    // Pity Mode ainda trava de verdade em 100%
+    if (progress >= 100 && currentMode === "pity") {
         playSound("./sfx/Tv_Click.mp3");
         return;
+    }
+
+    // Percentage Mode: se tá em 100% e o player ignorou o spot → força o spot + log
+    if (progress >= 100 && currentMode === "percentage" && !spottedFloors.includes(floor)) {
+        forceSpotCurrentFloor();
     }
 
     if (isBreakFloor) {
@@ -205,10 +246,7 @@ function nextFloor() {
         floor++;
     } else if (floor > 0 && floor % 25 === 0) {
         isBreakFloor = true;
-        progress = 0;
-
         playSound("./sfx/BT.mp3", 0.5);
-
         updateFloorDisplay();
         updateCapsule();
         tableVerifier();
@@ -231,7 +269,7 @@ function nextFloor() {
     }
 
     if (floor >= 5) {
-        spawnDrops(16 + Math.floor(Math.random() * 10));
+        spawnDrops(12 + Math.floor(Math.random() * 6));
     }
 
     updateFloorDisplay();
@@ -258,9 +296,10 @@ function resetFloor() {
     updateCapsule();
 
     const historico = document.getElementById("mainSpotted");
-
-    historico.innerHTML = "";
-    historico.classList.remove("container-css-historico");
+    if (historico) {
+        historico.innerHTML = "";
+        historico.classList.remove("container-css-historico");
+    }
 
     tableVerifier();
 }
@@ -285,12 +324,12 @@ function mainSpotted() {
     updateCapsule();
 
     const historico = document.getElementById("mainSpotted");
-    const novaLinha = document.createElement("div");
+    if (!historico) return;
 
+    const novaLinha = document.createElement("div");
     novaLinha.dataset.floor = floor;
 
-    novaLinha.innerHTML = 
-    `
+    novaLinha.innerHTML = `
         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right-fill" viewBox="0 0 16 16">
             <path d="m12.14 8.753-5.482 4.796c-.646.566-1.658.106-1.658-.753V3.204a1 1 0 0 1 1.659-.753l5.48 4.796a1 1 0 0 1 0 1.506z"/>
         </svg>
@@ -307,6 +346,7 @@ function mainSpotted() {
 
 function clearHistory() {
     const historico = document.getElementById("mainSpotted");
+    if (!historico) return;
 
     if (historico.innerHTML !== "") {
         playSound("./sfx/SE.mp3", 1, 1.5);
@@ -339,17 +379,15 @@ function spawnDrops(quantidade = 10) {
     const fillRatio = (Math.min(progress, 100) / 100) * 0.72;
     const originY = wrapper.clientHeight * (1 - fillRatio - 0.12);
 
-    quantidade = Math.min(quantidade, 12);
+    quantidade = Math.min(quantidade, 10); // limite mais baixo pra não virar lag
 
     for (let i = 0; i < quantidade; i++) {
         const drop = document.createElement("img");
-
         drop.src = "imgs/Ichor.png";
         drop.className = "drop";
         drop.alt = "";
 
         const size = 7 + Math.random() * 11;
-
         drop.style.width = `${size}px`;
         drop.style.height = `${size}px`;
         drop.style.left = `${originX + (Math.random() * 16 - 8)}px`;
@@ -366,9 +404,7 @@ function spawnDrops(quantidade = 10) {
         drop.style.setProperty("--rot", rot);
 
         const duration = 0.35 + Math.random() * 0.3;
-
-        drop.style.animation =
-            `splash ${duration}s cubic-bezier(.2,.7,.3,1) forwards`;
+        drop.style.animation = `splash ${duration}s cubic-bezier(.2,.7,.3,1) forwards`;
 
         wrapper.appendChild(drop);
 
@@ -378,6 +414,7 @@ function spawnDrops(quantidade = 10) {
     }
 }
 
+// Inicialização
 updateFloorDisplay();
 updateProgress();
 updateCapsule();
